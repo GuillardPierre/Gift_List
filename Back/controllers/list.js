@@ -1,11 +1,32 @@
 const List = require("../models/List");
-const User = require("../models/user");
+const User = require("../models/User");
+const fs = require("fs");
 
 exports.createNewList = async (req, res, next) => {
   try {
-    const newList = new List(req.body);
-    console.log(req.body);
+    const listObject = req.body;
+    delete listObject._id;
+    let imageUrl = "";
+    if (req.file) {
+      imageUrl = `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`;
+    }
+    const nomListe = req.body.name;
+    const newList = new List({
+      ...listObject,
+      owner: req.auth.userId,
+      imageUrl: imageUrl,
+    });
     await newList.save();
+    const list = await List.findOne({ owner: req.auth.userId, name: nomListe });
+    owner = await User.findOne({ _id: req.auth.userId });
+    if (owner._id.toString() === list.owner) {
+      const modif = await User.updateOne(
+        { _id: req.auth.userId },
+        { $push: { ownList: list._id.toString() } }
+      );
+    }
     res.status(201).json({ message: "Liste enregistrée" });
   } catch (error) {
     res.status(400).json({ error });
@@ -16,8 +37,7 @@ exports.createNewList = async (req, res, next) => {
 exports.getOneList = async (req, res, next) => {
   try {
     const oneList = await List.findOne({ _id: req.params.id });
-    console.log(oneListlist);
-    res.status(200).json({ oneList });
+    res.status(200).json({ name: oneList.name, list: oneList.list });
   } catch (error) {
     res.status(400).json({ error });
     console.log(error);
@@ -30,12 +50,23 @@ exports.updateOne = async (req, res, next) => {
   if (req.body.method === "ownerModification") {
     console.log("controller propriétaire");
     try {
+      const listObject = req.file
+        ? {
+            ...req.body,
+            imageUrl: `${req.protocol}://${req.get("host")}/images/${
+              req.file.filename
+            }`,
+          }
+        : { ...req.body };
+      delete listObject._id;
+      delete listObject.owner;
+
       const updatedList = await List.updateOne(
         {
           _id: req.params.id,
           owner: req.auth.userId,
         },
-        { ...req.body, _id: req.params.id }
+        { ...listObject, _id: req.params.id }
       );
       if (updatedList.matchedCount === 0) {
         res.status(401).json({ message: "modification non autorisée" });
@@ -74,12 +105,18 @@ exports.updateOne = async (req, res, next) => {
 
 exports.deleteOne = async (req, res, next) => {
   try {
+    const list = await List.findOne({
+      _id: req.params.id,
+      owner: req.auth.userId,
+    });
+    if (list && list.imageUrl) {
+      const filename = list.imageUrl.split("/images/")[1];
+      fs.unlink(`images/${filename}`);
+    }
     const deletedList = await List.deleteOne({
       _id: req.params.id,
       owner: req.auth.userId,
     });
-    console.log("pout", req.params.id);
-    console.log(deletedList);
     if (deletedList.deletedCount === 0) {
       res.status(401).json({ message: "modification non autorisée" });
     } else {

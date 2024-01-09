@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Noto+Sans:wght@200;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <script type="module" src="../Front/JS/index.js" defer></script>
+
+    <title>Gift List</title>
+  </head>
+
+  <header>
+    <div class="addList">
+      <img
+        src="/Projet perso de A à Z/GiftList/images/add.png"
+        alt="searchImage"
+      />
+    </div>
+    <div class="titre">
+      <h1>Gift List</h1>
+      <h2>Pour ne jamais être à court d'idées cadeaux</h2>
+    </div>
+    <div class="userInfos">
+      <div class="photo">
+        <a href="auth.html">
+          <img
+            src="/Projet perso de A à Z/GiftList/images/user.png"
+            alt="userImage"
+        /></a>
+      </div>
+    </div>
+  </header>
+
+  <body>
+    <div class="nouvelleListe">
+      <div class="nameNewList">
+        <input
+          type="text"
+          name="inputNameNewList"
+          id="inputNameNewList"
+          placeholder="Choisir un nom de liste"
+        />
+      </div>
+      <ul class="listToComplete"></ul>
+    </div>
+
+    <div class="container">
+      <div class="myOwnLists">
+        <h3>Mes listes créées</h3>
+        <div class="listOfList"></div>
+      </div>
+      <div class="followedList">
+        <h3>Mes listes suivies</h3>
+        <div class="listOfList"></div>
+      </div>
+    </div>
+    <div class="btnRefreshList">Clique ici pour raffraichir tes listes</div>
+  </body>
+</html>

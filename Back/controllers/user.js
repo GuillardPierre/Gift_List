@@ -1,32 +1,37 @@
-const User = require("../models/user");
+const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { use } = require("../routes/list");
+
+const saltRounds = 10;
 
 exports.signup = async (req, res, next) => {
   try {
+    console.log("controller signup");
     //Permet de hasher le mdp donné dans le body.
-    const hashPassword = bcrypt.hash(req.body.password, 10);
+    const hashPassword = await bcrypt.hash(req.body.password, 10);
+    console.log(hashPassword);
     //Enregistrement d'un nouveau User.
     const user = new User({
       userName: req.body.userName,
       email: req.body.email,
-      password: await hashPassword,
+      password: hashPassword,
       listMembers: [],
     });
+    console.log(hashPassword);
     await user.save();
-    console.log(user);
-    res.status(201).json({ message: "utilisateur créé" });
+    res.status(201).json({ message: "utilisateur créé", signup: true });
   } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la création du compte" });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la création du compte", signup: false });
     console.error(error);
   }
 };
 
 exports.login = async (req, res, next) => {
   try {
-    console.log(User);
     const user = await User.findOne({ email: req.body.email });
-    console.log(user, req.body);
     //Getion du cas où le user n'est pas trouvé.
     if (!user) {
       console.log("erreur email");
@@ -41,18 +46,20 @@ exports.login = async (req, res, next) => {
     );
     //Gestion du cas ou le password n'est pas le bon.
     if (!hashedPassword) {
-      console.log("erreur mdp");
       return res
         .status(401)
         .json({ message: "Paire mail/mot de passe incorrecte" });
     }
     res.status(200).json({
-      userId: user._id,
+      connected: true,
+      userName: user.userName,
+      email: user.email,
+      ownList: user.ownList,
+      listMembers: user.listMembers,
       token: jwt.sign({ userId: user._id }, process.env.TOKEN, {
         expiresIn: "24h",
       }),
     });
-    console.log(user._id);
   } catch (error) {
     res.status(500).json({ message: "Erreur de connexion" });
     console.error(error);
@@ -70,7 +77,6 @@ exports.updateUser = async (req, res, next) => {
       //Le push n'autorise que les ajouts et ne permet pas de supprimer les autres liste du user
       { $push: { listMembers: req.body.listMembers }, _id: req.params.id }
     );
-    console.log(updatedUser);
     if (updatedUser.modifiedCount === 0) {
       res.status(401).json({ message: "modification échouée" });
     } else {
@@ -78,6 +84,16 @@ exports.updateUser = async (req, res, next) => {
     }
   } catch (error) {
     res.status(400).json(error);
-    console.log(error);
+    console.error(error);
   }
+};
+
+exports.foundUsers = async (req, res, next) => {
+  try {
+    const listeUsers = await User.find({ userName: req.params.id }).select(
+      "-_id email userName listMembers ownList listMembers"
+    );
+    delete listeUsers._id;
+    res.status(200).json({ listeUsers });
+  } catch (error) {}
 };

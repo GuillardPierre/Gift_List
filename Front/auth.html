@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Noto+Sans:wght@200;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <script src="../Front/JS/auth.js" defer></script>
+    <title>Gift List connexion</title>
+  </head>
+
+  <header>
+    <div class="titre">
+      <h1>Gift List</h1>
+      <h2>Pour ne jamais être à court d'idées cadeaux</h2>
+    </div>
+    <div class="userInfos">
+      <div class="photo">
+        <a href="index.html">
+          <img
+            src="/Projet perso de A à Z/GiftList/images/home.png"
+            alt="userImage"
+        /></a>
+      </div>
+    </div>
+  </header>
+
+  <body>
+    <div class="connexionConteneur">
+      <div class="presentation">
+        <h3>Bonjour !</h3>
+        <p>Connectez-vous afin de découvrir toutes les fonctionnalités</p>
+      </div>
+      <p>Email</p>
+      <input type="email" name="email" id="userEmail" />
+      <p>Mot de passe</p>
+      <input type="password" name="mot de passe" id="userPassword" />
+      <br />
+      <button id="seConnecter">Se connecter</button>
+      <div class="optionCreationCompte">
+        <p>Envie de nous rejoindre ? <span>Créer un compte</span></p>
+      </div>
+    </div>
+
+    <div class="creationCompte">
+      <h3>Bonjour et bienvenue sur Gift List</h3>
+      <p>
+        Vos informations serviront seulement afin que vos amis et votre famille
+        puisse vous retrouver
+      </p>
+      <input type="text" name="prénom" id="prenom" placeholder="Prénom" />
+      <input type="text" name="nom" id="nom" placeholder="Nom de famille" />
+      <input type="email" name="email" id="signupEmail" placeholder="Email" />
+      <input
+        type="password"
+        name="mot de passe"
+        id="signupPassword"
+        placeholder="Mot de passe"
+      />
+
+      <button id="creerCompte">Créer un compte</button>
+    </div>
+
+    <div class="userProfil">
+      <div class="user">
+        <h3>Bienvenue <span></span></h3>
+        <p>Nombre de listes : <span></span></p>
+      </div>
+      <div class="userConnecteInfos">
+        <div class="mesListes">
+          <h4>Mes listes</h4>
+          <p>Gérer mes listes déposées</p>
+        </div>
+        <div class="listesSuivis">
+          <h4>Listes suivies</h4>
+          <p>Gérer mes listes suivies</p>
+        </div>
+        <div class="parametres">
+          <h4>Paramètres</h4>
+          <p>Gérer mes informations</p>
+        </div>
+        <div class="deconnexion">
+          <h4>Déconnexion</h4>
+          <p>Pour se... déconnecter ?</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
