@@ -1,4 +1,5 @@
 import { foundList, foundUser, sendListToServer } from "./indexAPI.js";
+import { addEventListenerDeleteList } from "./btnsGestionList.js";
 
 const btnCreate = document.querySelector(".addList");
 const zoneCreationList = document.querySelector(".nouvelleListe");
@@ -44,6 +45,7 @@ inputCreationList.addEventListener(
 );
 
 function addListElement() {
+  console.log(lastListElement);
   //Après la première itération on supprime l'eventListener pour éviter troooop d'éléments dans la liste.
   if (lastListElement != "") {
     lastListElement.removeEventListener("keydown", addListElement);
@@ -60,7 +62,12 @@ function addListElement() {
   //Permet de récupérer le nouvel élément avec son id, d'ajouter un eventListener avec la même fonction
   //et de supprimer l'id du nouvel élément pour que la boucle fonctionne à la prochaine itération.
   lastListElement = document.querySelector("#lastNewLine");
-  lastListElement.addEventListener("keydown", addListElement);
+  lastListElement.addEventListener("keydown", () => {
+    if (newLine.value.length === 1) {
+      console.log("test");
+      addListElement();
+    }
+  });
   lastListElement.removeAttribute("id");
   //Permet de valider la liste en rajoutant un boutton à partir du moment où la liste fait plus de 1 élément.
   if (listToComplete.childElementCount === 2) {
@@ -118,7 +125,7 @@ function deleteListElement(e, element) {
   }
 }
 
-async function refreshList() {
+export async function refreshList() {
   if (window.localStorage.getItem("connecté") != null) {
     followedListName = [];
     itemsOflistFollowed = [];
@@ -140,12 +147,16 @@ async function refreshList() {
       "myOwnLists",
       `${userInfo.listeUsers[0].ownList}`
     );
-    myOwnListsId = window.localStorage.getItem("myOwnLists").split(",");
-    followedListsId = window.localStorage.getItem("followedList").split(",");
+    if (window.localStorage.getItem("myOwnLists").length > 0) {
+      myOwnListsId = window.localStorage.getItem("myOwnLists").split(",");
+    }
+    if (window.localStorage.getItem("followedList").length > 0) {
+      followedListsId = window.localStorage.getItem("followedList").split(",");
+    }
     followedListsZone.innerHTML = "";
     ownListsZone.innerHTML = "";
     //Pour chacune de mes listes, j'envoie une requête pour récupérer les éléments de celle-ci.
-    if (followedListsId.length > 0) {
+    if (followedListsId.length != 0) {
       for (const element of followedListsId) {
         const rep = await foundList(element);
         followedListName.push(rep.name);
@@ -155,30 +166,38 @@ async function refreshList() {
     for (let i = 0; i < followedListName.length; i++) {
       createNewListOnBoard(
         followedListName[i],
+        followedListsId,
         itemsOflistFollowed[i],
         i,
         "notMyList"
       );
     }
-    if (myOwnListsId.length >= 1) {
+    if (myOwnListsId.length != 0) {
       for (const element of myOwnListsId) {
         const rep = await foundList(element);
         ownListsName.push(rep.name);
         itemsOfOwnList.push(rep.list);
       }
     }
-
-    for (let u = 0; u < ownListsName.length; u++) {
-      createNewListOnBoard(ownListsName[u], itemsOfOwnList[u], u, "myList");
+    if (ownListsName.length > 0) {
+      console.log(ownListsName);
+      for (let u = 0; u < ownListsName.length; u++) {
+        createNewListOnBoard(
+          ownListsName[u],
+          myOwnListsId[u],
+          itemsOfOwnList[u],
+          u,
+          "myList"
+        );
+      }
     }
-    // const allDeletebtn = document.querySelectorAll(".bin");
-    // allDeletebtn.addEventListener("click", console);
+    addEventListenerDeleteList();
   }
 }
 
 //Permet d'afficher des listes sur la page d'accueil. "typeList" permet de différencier ses listes
 // et celles des autres.
-function createNewListOnBoard(name, list, i, typeList) {
+function createNewListOnBoard(name, listId, list, i, typeList) {
   // Création de la div principale
   const giftListDiv = document.createElement("div");
   giftListDiv.classList.add("giftlist");
@@ -237,6 +256,7 @@ function createNewListOnBoard(name, list, i, typeList) {
       const classname = imageSrc.replace(".png", "");
       img.src = `/Projet perso de A à Z/GiftList/images/${imageSrc}`;
       img.alt = imageSrc.replace(".png", "");
+      img.id = listId;
       img.classList.add(classname);
       featureListDiv.appendChild(img);
     });

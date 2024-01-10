@@ -19,12 +19,11 @@ exports.createNewList = async (req, res, next) => {
       imageUrl: imageUrl,
     });
     await newList.save();
-    const list = await List.findOne({ owner: req.auth.userId, name: nomListe });
     owner = await User.findOne({ _id: req.auth.userId });
-    if (owner._id.toString() === list.owner) {
+    if (owner._id.toString() === newList.owner) {
       const modif = await User.updateOne(
         { _id: req.auth.userId },
-        { $push: { ownList: list._id.toString() } }
+        { $push: { ownList: newList._id.toString() } }
       );
     }
     res.status(201).json({ message: "Liste enregistrée" });
@@ -113,6 +112,7 @@ exports.deleteOne = async (req, res, next) => {
       const filename = list.imageUrl.split("/images/")[1];
       fs.unlink(`images/${filename}`);
     }
+
     const deletedList = await List.deleteOne({
       _id: req.params.id,
       owner: req.auth.userId,
@@ -121,6 +121,10 @@ exports.deleteOne = async (req, res, next) => {
       res.status(401).json({ message: "modification non autorisée" });
     } else {
       res.status(200).json({ message: "Liste supprimée" });
+      await User.updateOne(
+        { ownList: req.params.id },
+        { $pull: { ownList: req.params.id } }
+      );
       await User.updateMany(
         { listMembers: req.params.id },
         { $pull: { listMembers: req.params.id } }
