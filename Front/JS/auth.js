@@ -75,6 +75,7 @@ async function connexionLocal() {
     window.localStorage.setItem("TOKEN", `${rep.token}`);
     window.localStorage.setItem("followedList", `${rep.listMembers}`);
     window.localStorage.setItem("myOwnLists", `${rep.ownList}`);
+    window.localStorage.setItem("avatarURL", `${rep.avatarURL}`);
     allInput.forEach((element) => {
       element.style.border = "1px solid";
     });
@@ -105,6 +106,8 @@ function deconnexion() {
   window.localStorage.removeItem("TOKEN");
   window.localStorage.removeItem("followedList");
   window.localStorage.removeItem("myOwnLists");
+  window.localStorage.removeItem("avatarURL");
+
   connexionContainer.style.display = "block";
   userProfil.style.display = "none";
   inputEmail.value = "";
@@ -146,7 +149,6 @@ btnSubmitFile.addEventListener("click", async () => {
         {
           method: "PUT",
           headers: {
-            "Content-type": "application/json",
             authorization: `Bearer ${window.localStorage.getItem("TOKEN")}`,
           },
           body: formData,

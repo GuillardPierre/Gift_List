@@ -269,3 +269,11 @@ function createNewListOnBoard(name, listId, list, i, typeList) {
     followedListsZone.appendChild(giftListDiv);
   }
 }
+
+if (window.localStorage.getItem("avatarURL") != undefined) {
+  document.querySelector(".userImage").src =
+    window.localStorage.getItem("avatarURL");
+} else {
+  document.querySelector(".userImage").src =
+    "/Projet perso de A à Z/GiftList/images/user.png";
+}

@@ -2,27 +2,32 @@ const User = require("../models/User");
 const fs = require("fs");
 
 exports.addImage = async (req, res, next) => {
-  console.log(req.body);
-  //   if (req.files) {
-  //     try {
-  //       console.log("il y a un reqfile");
-  //       const userObject = req.files.image
-  //         ? {
-  //             imageUrl: `${req.protocol}://${req.get("host")}/images/${
-  //               req.files.image.filename
-  //             }`,
-  //           }
-  //         : { ...req.body };
-  //       console.log(userObject);
-  //       delete userObject._id;
-  //       const rep = await User.findOne(req.params.id);
-  //       if (rep._id === req.auth.userId) {
-  //         const rep2 = await User.updateOne(
-  //           { _id: req.params.id },
-  //           { avatarUrl: userObject, _id: req.params.id }
-  //         );
-  //         console.log("rep2: ", rep2);
-  //       }
-  //     } catch (error) {}
-  //   }
+  if (req.file) {
+    try {
+      const userObject = req.file
+        ? {
+            imageUrl: `${req.protocol}://${req.get(
+              "host"
+            )}/images/${req.file.filename.split(" ").join("_")}`,
+          }
+        : { ...req.body };
+      console.log(userObject);
+      const rep = await User.findOne({ _id: req.params.id });
+      console.log(rep._id.toString(), req.auth.userId);
+      if (rep._id.toString() === req.auth.userId) {
+        const rep2 = await User.updateOne(
+          { _id: req.params.id },
+          { avatarURL: userObject.imageUrl, _id: req.params.id }
+        );
+        console.log("rep2: ", rep2);
+        if (rep2.modifiedCount === 0) {
+          res.status(401).json({ message: "La modification a échouée" });
+        } else {
+          res.status(200).json({ message: "Image enregistrée" });
+        }
+      }
+    } catch (error) {
+      console.error("message erreur:", error);
+    }
+  }
 };
