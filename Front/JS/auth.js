@@ -125,3 +125,38 @@ if (window.localStorage.getItem("connecté") === "true") {
   connexionContainer.style.display = "none";
   userProfil.style.display = "inline";
 }
+
+// Gestion image profile
+const inputFile = document.querySelector("#file");
+const btnSubmitFile = document.querySelector("#sendFile");
+
+btnSubmitFile.addEventListener("click", async () => {
+  console.log(inputFile.value);
+  if (inputFile.value.length === 0) {
+    alert("Merci de sélectionner une image");
+    //il faudrait rajouter un cas de figure ou le fichier n'est pas une image
+  } else {
+    const file = inputFile.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+    console.log(formData);
+    try {
+      const reponse = await fetch(
+        `http://localhost:3000/images/657c934f407ec335f3fcf33b`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${window.localStorage.getItem("TOKEN")}`,
+          },
+          body: formData,
+        }
+      );
+      const rep = await reponse.json();
+      console.log(rep);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  console.log(inputFile.files[0]);
+});

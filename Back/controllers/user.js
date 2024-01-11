@@ -69,14 +69,43 @@ exports.login = async (req, res, next) => {
 //Ce controlleur permet aux autre user de rajouter quelqu'un dans une de ses listes.
 exports.updateUser = async (req, res, next) => {
   try {
+    if (req.file) {
+      console.log("il y a un reqfile");
+      const userObject = req.file
+        ? {
+            // ...JSON.parse(req.body),
+            imageUrl: `${req.protocol}://${req.get("host")}/images/${
+              req.file.filename
+            }`,
+          }
+        : { ...req.body };
+      console.log(userObject);
+      delete userObject._id;
+      const rep = await User.findOne(req.params.id);
+      if (rep._id === req.auth.userId) {
+        const rep2 = await User.updateOne(
+          { _id: req.params.id },
+          { ...req.body, _id: req.params.id }
+        );
+        if (rep2.modifiedCount === 0) {
+          res.status(401).json({ message: "modification échouée" });
+        } else {
+          res
+            .status(200)
+            .json({ message: "Liste partagée avec l'utilisateur" });
+        }
+      }
+    }
+
     const updatedUser = await User.updateOne(
       {
         _id: req.params.id,
         // Option : rajouter une option où la personne qui vient modifier doit être dans les contacts ajoutés par la personne?
       },
-      //Le push n'autorise que les ajouts et ne permet pas de supprimer les autres liste du user
+      // Le push n'autorise que les ajouts et ne permet pas de supprimer les autres listes du user
       { $push: { listMembers: req.body.listMembers }, _id: req.params.id }
     );
+
     if (updatedUser.modifiedCount === 0) {
       res.status(401).json({ message: "modification échouée" });
     } else {
@@ -84,7 +113,7 @@ exports.updateUser = async (req, res, next) => {
     }
   } catch (error) {
     res.status(400).json(error);
-    console.error(error);
+    console.error("Erreur modification user : ", error);
   }
 };
 

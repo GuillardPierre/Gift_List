@@ -9,10 +9,11 @@ const path = require("path");
 const listRoutes = require("./routes/list");
 //Sert à ajouter les routes qui permettent de se signup et de se login.
 const userRoutes = require("./routes/user");
+const imageRoutes = require("./routes/image");
 
 dotenv.config();
 const app = express();
-app.use(bodyParser.json());
+app.use("/api", bodyParser.json());
 //ne pas oublier les parenthèses à (cors()).
 app.use(cors());
 mongoose
@@ -26,6 +27,6 @@ mongoose
 app.use("/api/list", listRoutes);
 app.use("/api/auth", userRoutes);
 // Pas sur de comprendre cette ligne
+app.use("/images", imageRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
-
 module.exports = app;

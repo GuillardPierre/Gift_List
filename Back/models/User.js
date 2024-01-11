@@ -7,6 +7,7 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true },
   ownList: { type: Array, required: true },
   listMembers: { type: Array, required: true },
+  avatarUrl: { type: String, required: false },
 });
 
 //Permet d'utiliser le package unique-validator et ne pas avoir plusieurs fois le même user ou email.
